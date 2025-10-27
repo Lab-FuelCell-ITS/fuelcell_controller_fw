@@ -1,32 +1,74 @@
-# Prerequisites
-*.d
+# -------------------------------------------------------------------
+# STM32CubeIDE / STM32CubeMX project .gitignore
+# -------------------------------------------------------------------
 
-# Compiled Object files
-*.slo
-*.lo
+# Build artifacts
 *.o
-*.obj
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.srec
 
-# Precompiled Headers
-*.gch
-*.pch
+# Executables and temporary files
+*.out
+*.exe
+*.app
 
-# Compiled Dynamic libraries
+# Static and dynamic libraries
+*.a
+*.lib
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
+# Precompiled headers
+*.gch
+*.pch
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# IDE-generated folders
+/Debug/
+/Release/
+/build/
+/Core/Startup/startup_*.o
 
-# Executables
-*.exe
-*.out
-*.app
+# STM32CubeIDE metadata (Eclipse-based)
+.settings/
+.vscode/
+.cproject
+.project
+.loadpath
+
+# CubeMX auto-generated backup files
+*.ioc-backup
+*.mxproject
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Temporary or cache files
+*.tmp
+*.swp
+*.bak
+*.old
+
+# Generated object folders
+*.dep
+*.axf
+
+# -------------------------------------------------------------------
+# Keep source and configuration files
+# (don’t ignore these!)
+# -------------------------------------------------------------------
+!*.ioc
+!Core/**
+!Drivers/**
+!Middlewares/**
+!Src/**
+!Inc/**
+!Utilities/**
+!app/**
