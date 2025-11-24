@@ -36,7 +36,7 @@ typedef enum {
 #define UNDERPRESSURE (20.0f)
 
 // fc simulasi
-#define DUMMY 1
+//#define DUMMY
 
 
 typedef struct {

@@ -7,9 +7,11 @@
 
 #include "fuelcell.h"
 
-FullCell_t fuelcell;
+#ifdef DUMMY
 FullCell_t fuelcell_dummy;
-
+#else
+FullCell_t fuelcell;
+#endif
 
 extern Cerebral55_Handle_t cerebral_1;
 extern Cerebral55_Handle_t cerebral_2;
@@ -69,10 +71,15 @@ void fc_init() {
 
 }
 
+GPIO_PinState fc_gpio_mode_input;
+
 void fc_update() {
 
 #ifdef DUMMY
 	fc_check_fault(&fuelcell_dummy);
+
+	if(HAL_GPIO_ReadPin(EX_3_GPIO_Port, EX_3_Pin)) fuelcell_dummy.mode = INTEGRATED;
+		else fuelcell_dummy.mode = STANDALONE;
 #else
 	fuelcell.temp[0] = max1.temp;
 	fuelcell.temp[1] = max2.temp;
@@ -85,7 +92,11 @@ void fc_update() {
 
 	fuelcell.tank_pressure = lcan_data.value;
 	fc_check_fault(&fuelcell);
+
+	if(HAL_GPIO_ReadPin(EX_3_GPIO_Port, EX_3_Pin)) fuelcell.mode = INTEGRATED;
+	else fuelcell.mode = STANDALONE;
 #endif
+
 
 }
 
