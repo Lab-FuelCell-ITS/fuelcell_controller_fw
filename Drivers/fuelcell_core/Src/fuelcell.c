@@ -79,7 +79,7 @@ void fc_update() {
 	fc_check_fault(&fuelcell_dummy);
 
 	if(HAL_GPIO_ReadPin(EX_3_GPIO_Port, EX_3_Pin)) fuelcell_dummy.mode = INTEGRATED;
-		else fuelcell_dummy.mode = STANDALONE;
+	else fuelcell_dummy.mode = STANDALONE;
 #else
 	fuelcell.temp[0] = max1.temp;
 	fuelcell.temp[1] = max2.temp;
