@@ -61,7 +61,7 @@ int fc_sensor_precheck(FullCell_t *fuelcell) {
 		fuelcell->fault_under_pressure = 0;
 	}
 
-	if((fuelcell->fault_over_temperature == 1) && (fuelcell->fault_under_pressure)) return 1;
+	if((fuelcell->fault_over_temperature == 0) && (fuelcell->fault_under_pressure == 0)) return 1;
 
 	return 0;
 

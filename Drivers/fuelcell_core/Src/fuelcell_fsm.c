@@ -82,9 +82,11 @@ static void on_update_init(void) {
 //		if (fc_can_check_timeout())
 //			timeout_flag = 1;
 //	}
-	if (fc_check_mode(&fuelcell_dummy) == INTEGRATED) {
-		if (fc_can_check_timeout())
-			timeout_flag = 1;
+
+
+//	if (fc_check_mode(&fuelcell_dummy) == INTEGRATED) {
+//		if (fc_can_check_timeout())
+//			timeout_flag = 1;
 	}
 #else
 	//	fc_state_flag = fuelcell.enable_command;
@@ -98,8 +100,6 @@ static void on_update_init(void) {
 //		if (fc_check_mode(&fuelcell) == INTEGRATED) {
 //			if (fc_can_check_timeout()) timeout_flag = 1;
 //		}
-
-
 #endif
 }
 
