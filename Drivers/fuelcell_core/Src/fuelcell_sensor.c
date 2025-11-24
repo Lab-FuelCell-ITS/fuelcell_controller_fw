@@ -47,22 +47,23 @@ void fc_sensor_init(void) {
 }
 
 int fc_sensor_precheck(FullCell_t *fuelcell) {
+
 	if ((fuelcell->temp[0] < UNDERTEMP) || (fuelcell->temp[0] > OVERTEMP)) {
 		fuelcell->fault_over_temperature = 1;
-
-		return 0;
 
 	} else {
 		fuelcell->fault_over_temperature = 0;
 	}
 
 	if (fuelcell->tank_pressure < UNDERPRESSURE) {
-		return 0;
-	} else {
-
+		fuelcell->fault_under_pressure = 1;
+	}	else	{
+		fuelcell->fault_under_pressure = 0;
 	}
 
-	return 1;
+	if((fuelcell->fault_over_temperature == 1) && (fuelcell->fault_under_pressure)) return 1;
+
+	return 0;
 
 }
 void fc_sensor_ReaBlocking(void) {

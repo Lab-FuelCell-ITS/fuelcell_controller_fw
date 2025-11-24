@@ -95,6 +95,8 @@ void fc_update() {
 
 	if(HAL_GPIO_ReadPin(EX_3_GPIO_Port, EX_3_Pin)) fuelcell.mode = INTEGRATED;
 	else fuelcell.mode = STANDALONE;
+
+
 #endif
 
 

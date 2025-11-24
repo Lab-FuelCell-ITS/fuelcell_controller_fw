@@ -94,10 +94,12 @@ static void on_update_init(void) {
 	//		if (fc_can_check_timeout())
 	//			timeout_flag = 1;
 	//	}
-		if (fc_check_mode(&fuelcell) == INTEGRATED) {
-			if (fc_can_check_timeout())
-				timeout_flag = 1;
-		}
+
+//		if (fc_check_mode(&fuelcell) == INTEGRATED) {
+//			if (fc_can_check_timeout()) timeout_flag = 1;
+//		}
+
+
 #endif
 }
 
@@ -140,9 +142,7 @@ static void on_update_prestarting(void) {
 static void on_exit_prestarting(void) {
 	/* Cleanup after startup */
 	DEBUG_PRINT("FSM", "OUT PRESTARTING");
-
 	prestart_flag = 0; // reset prestart flag
-
 	fc_io_can_filter(OFF);
 }
 

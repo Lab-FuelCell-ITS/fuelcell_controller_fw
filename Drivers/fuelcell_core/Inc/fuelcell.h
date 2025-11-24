@@ -58,6 +58,7 @@ typedef struct {
 	uint8_t fault_over_current;    // 0 = no error, 1 = error
 	uint8_t fault_over_voltage;    // 0 = no error, 1 = error
 	uint8_t fault_over_temperature; // 0 = no error, 1 = error
+	uint8_t fault_under_pressure;
 
 } FullCell_t;
 
