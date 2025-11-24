@@ -29,6 +29,8 @@ static void cerebral_1_Callback(UART_HandleTypeDef *huart, uint16_t Size);
 static void cerebral_2_Callback(UART_HandleTypeDef *huart, uint16_t Size);
 
 void fc_sensor_init(void) {
+#ifdef DUMMY
+#else
 	MAX6675_Init(&max1, &hspi3, MAX_1_CS_GPIO_Port, MAX_1_CS_Pin);
 	MAX6675_Init(&max2, &hspi3, MAX_0_CS_GPIO_Port, MAX_0_CS_Pin);
 
@@ -41,6 +43,7 @@ void fc_sensor_init(void) {
 	Cerebral55_Init(&cerebral_2);
 	HAL_UART_RegisterRxEventCallback(&huart3, cerebral_2_Callback);
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart3, buffer2, CEREBRAL_BUFFER);
+#endif
 }
 
 int fc_sensor_precheck(FullCell_t *fuelcell) {
@@ -63,9 +66,12 @@ int fc_sensor_precheck(FullCell_t *fuelcell) {
 
 }
 void fc_sensor_ReaBlocking(void) {
+#ifdef DUMMY
+#else
 	MAX6675_ReadBlocking(&max1, 500);
 	MAX6675_ReadBlocking(&max2, 500);
 	PressureSensor_ReadBlocking(&pressure, 500);
+#endif
 }
 
 static void cerebral_1_Callback(UART_HandleTypeDef *huart, uint16_t Size) {

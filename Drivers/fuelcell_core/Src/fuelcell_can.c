@@ -216,12 +216,15 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 			!= HAL_OK) {
 		Error_Handler();
 	}
+#ifdef DUMMY
+#else
 	if ((local_RxHeader.StdId == 0x111)) {
-		lcan_data.bytes[0] = local_RxData[0];
-		lcan_data.bytes[1] = local_RxData[1];
-		lcan_data.bytes[2] = local_RxData[2];
-		lcan_data.bytes[3] = local_RxData[3];
-	}
+			lcan_data.bytes[0] = local_RxData[0];
+			lcan_data.bytes[1] = local_RxData[1];
+			lcan_data.bytes[2] = local_RxData[2];
+			lcan_data.bytes[3] = local_RxData[3];
+		}
+#endif
 }
 
 static void fc_can_pack_status(FullCell_t *fc, uint8_t *data_buf) {
