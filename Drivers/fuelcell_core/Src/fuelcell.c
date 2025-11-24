@@ -36,11 +36,6 @@ void fc_init() {
 	fc_fsm_init();
 }
 
-#define UNDERVOLT	(60.0f)   // 5%
-#define OVERVOLT	(74.0f)   // 4.5 bar
-#define OVERCURRENT	(160.0f)  // 20 C
-#define UNDERTEMP	(20.0f)  // 60 C
-#define OVERTEMP	(60.0f)
 
 void fc_update() {
 	fuelcell.temp[0] = max1.temp;
@@ -55,19 +50,19 @@ void fc_update() {
 	fuelcell.tank_pressure = lcan_data.value;
 
 	// check fault
-//	if ((fuelcell.voltage < UNDERVOLT) || (fuelcell.voltage > OVERVOLT))
-//		fuelcell.fault_over_voltage = 1;
-//	else
-//		fuelcell.fault_over_voltage = 0;
-//
-//	if (fuelcell.current > OVERCURRENT)
-//		fuelcell.fault_over_current = 1;
-//	else
-//		fuelcell.fault_over_current = 0;
-//
-//
-//	if ((fuelcell.temp[0] < UNDERTEMP) || (fuelcell.temp[0] > OVERTEMP)) fuelcell.fault_over_temperature = 1;
-//	else fuelcell.fault_over_temperature = 0;
+	if ((fuelcell.voltage < UNDERVOLT) || (fuelcell.voltage > OVERVOLT))
+		fuelcell.fault_over_voltage = 1;
+	else
+		fuelcell.fault_over_voltage = 0;
+
+	if (fuelcell.current > OVERCURRENT)
+		fuelcell.fault_over_current = 1;
+	else
+		fuelcell.fault_over_current = 0;
+
+
+	if ((fuelcell.temp[0] < UNDERTEMP) || (fuelcell.temp[0] > OVERTEMP)) fuelcell.fault_over_temperature = 1;
+	else fuelcell.fault_over_temperature = 0;
 
 
 	if((fuelcell.state != STATE_ACTIVE)) fuelcell.operating_status = 1;

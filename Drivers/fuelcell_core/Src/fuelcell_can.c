@@ -162,8 +162,8 @@ void fc_can_gcan_transmit() {
 	TxHeader_Data.RTR = CAN_RTR_DATA;
 	TxHeader_Data.DLC = 8;
 
-	//fc_can_pack_measurements(&fuelcell, TxData_Data);
-	fc_can_pack_measurements(&fuelcell_dummy, TxData_Data);
+	fc_can_pack_measurements(&fuelcell, TxData_Data);
+//	fc_can_pack_measurements(&fuelcell_dummy, TxData_Data);
 
 
 	if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader_Status, TxData_Status,
@@ -195,8 +195,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 		Error_Handler();
 	}
 	if ((global_RxHeader.ExtId == 0x0CF11200)) {
-//		fc_can_parse_command(&fuelcell, global_RxData);
-		fc_can_parse_command(&fuelcell_dummy, global_RxData);
+		fc_can_parse_command(&fuelcell, global_RxData);
+//		fc_can_parse_command(&fuelcell_dummy, global_RxData);
 
 		g_last_can_rx_time = HAL_GetTick();
 	}
@@ -312,4 +312,12 @@ static void fc_can_parse_command(FullCell_t *fc, uint8_t *data_buf) {
 		return;
 
 	fc->enable_command = data_buf[0] & 0x01; // (Masking untuk keamanan)
+}
+
+int fc_can_check_timeout(void)
+{
+	if (HAL_GetTick() - g_last_can_rx_time > CAN_TIMEOUT_MS) {
+			return 1;
+		}
+	return 0;
 }

@@ -15,5 +15,5 @@
 
 void fc_sensor_init(void);
 void fc_sensor_ReaBlocking(void);
-
+int fc_sensor_precheck(FullCell_t *fuelcell);
 #endif /* FUELCELL_CORE_INC_FUELCELL_SENSOR_H_ */

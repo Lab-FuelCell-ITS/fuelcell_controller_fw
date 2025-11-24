@@ -11,6 +11,7 @@
 
 typedef enum {
 	STATE_INIT = 0,
+	STATE_PRE_STARTING,
 	STATE_STARTING,
 	STATE_ACTIVE,
 	STATE_PRE_TIMEOUT,
@@ -18,9 +19,27 @@ typedef enum {
 	STATE_STOP
 } state_t;
 
+typedef enum {
+	STANDALONE = 0,
+	INTEGRATED,
+
+} fcmode_t;
+
+#define CAN_TIMEOUT_MS 3000
+
+
+#define UNDERVOLT	(60.0f)   // 5%
+#define OVERVOLT	(74.0f)   // 4.5 bar
+#define OVERCURRENT	(160.0f)  // 20 C
+#define UNDERTEMP	(20.0f)  // 60 C
+#define OVERTEMP	(60.0f)
+#define UNDERPRESSURE (20.0f)
+
+
 typedef struct {
 	// Current operating state
 	state_t state;
+	fcmode_t mode;
 
 	uint8_t enable_command;
 	// Electrical measurements

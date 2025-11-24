@@ -19,4 +19,6 @@ void fc_can_lcan_transmit(void);
 
 void fc_can_gcan_callback(void);
 void fc_can_lcan_callback(void);
+
+int fc_can_check_timeout();
 #endif /* FUELCELL_CORE_INC_FUELCELL_CAN_H_ */
