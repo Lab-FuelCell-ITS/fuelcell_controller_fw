@@ -35,6 +35,9 @@ typedef enum {
 #define OVERTEMP	(60.0f)
 #define UNDERPRESSURE (20.0f)
 
+// fc simulasi
+#define DUMMY 1
+
 
 typedef struct {
 	// Current operating state

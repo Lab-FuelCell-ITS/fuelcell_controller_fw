@@ -8,6 +8,8 @@
 #include "fuelcell.h"
 
 FullCell_t fuelcell;
+FullCell_t fuelcell_dummy;
+
 
 extern Cerebral55_Handle_t cerebral_1;
 extern Cerebral55_Handle_t cerebral_2;
@@ -17,9 +19,38 @@ extern MAX6675_Handle_t max2;
 extern PressureSensor_HandleTypeDef pressure;
 extern FloatPack_t lcan_data;
 
+void fc_check_fault(FullCell_t *fc) {
+	// Voltage fault
+	fc->fault_over_voltage = (fc->voltage < UNDERVOLT)
+			|| (fc->voltage > OVERVOLT);
+
+	// Overcurrent fault
+	fc->fault_over_current = (fc->current > OVERCURRENT);
+
+	// Temperature fault (temp[0])
+	fc->fault_over_temperature = (fc->temp[0] < UNDERTEMP)
+			|| (fc->temp[0] > OVERTEMP);
+
+	// Operating status
+	fc->operating_status = (fc->state != STATE_ACTIVE);
+}
+
 void fc_init() {
 // Always check for a null pointer
 	// Set the initial state
+#ifdef DUMMY
+	fuelcell_dummy.state = STATE_INIT;
+		// Zero all sensor values
+	fuelcell_dummy.enable_command = 0;     // Default ke Disable
+	fuelcell_dummy.voltage = 0.0f;
+	fuelcell_dummy.current = 0.0f;
+	fuelcell_dummy.pressure[0] = 0.0f;
+	fuelcell_dummy.pressure[1] = 0.0f;
+	fuelcell_dummy.temp[0] = 0.0f;
+	fuelcell_dummy.temp[1] = 0.0f;
+	fuelcell_dummy.tank_pressure = 0.0f;
+#else
+
 	fuelcell.state = STATE_INIT;
 	// Zero all sensor values
 	fuelcell.enable_command = 0;     // Default ke Disable
@@ -30,14 +61,19 @@ void fc_init() {
 	fuelcell.temp[0] = 0.0f;
 	fuelcell.temp[1] = 0.0f;
 	fuelcell.tank_pressure = 0.0f;
+#endif
 
 	fc_can_init();
 	fc_sensor_init();
 	fc_fsm_init();
+
 }
 
-
 void fc_update() {
+
+#ifdef DUMMY
+	fc_check_fault(&fuelcell_dummy);
+#else
 	fuelcell.temp[0] = max1.temp;
 	fuelcell.temp[1] = max2.temp;
 
@@ -48,24 +84,8 @@ void fc_update() {
 	fuelcell.current = (cerebral_1.data.I_out + cerebral_2.data.I_out) / 2.0f;
 
 	fuelcell.tank_pressure = lcan_data.value;
+	fc_check_fault(&fuelcell);
+#endif
 
-	// check fault
-	if ((fuelcell.voltage < UNDERVOLT) || (fuelcell.voltage > OVERVOLT))
-		fuelcell.fault_over_voltage = 1;
-	else
-		fuelcell.fault_over_voltage = 0;
-
-	if (fuelcell.current > OVERCURRENT)
-		fuelcell.fault_over_current = 1;
-	else
-		fuelcell.fault_over_current = 0;
-
-
-	if ((fuelcell.temp[0] < UNDERTEMP) || (fuelcell.temp[0] > OVERTEMP)) fuelcell.fault_over_temperature = 1;
-	else fuelcell.fault_over_temperature = 0;
-
-
-	if((fuelcell.state != STATE_ACTIVE)) fuelcell.operating_status = 1;
-	else fuelcell.operating_status = 0;
 }
 

@@ -18,6 +18,7 @@ static bool eval_eq(int a, int b) {
 }
 
 extern FullCell_t fuelcell;
+extern FullCell_t fuelcell_dummy;
 
 uint8_t display_start;
 
@@ -27,6 +28,21 @@ int timeout_flag = 0;
 int prestart_flag = 0;
 
 extern uint32_t g_last_can_rx_time;
+
+void fc_set_state(FullCell_t *fuelcell, fsm_t *fsm) {
+	fuelcell->state = fsm->current_state;
+}
+
+void fc_set_enable_command(FullCell_t *fuelcell, uint8_t value) {
+	fuelcell->enable_command = value;
+}
+
+uint8_t fc_get_enable_command(FullCell_t *fuelcell) {
+	return fuelcell->enable_command;
+}
+fcmode_t fc_check_mode(FullCell_t *fuelcell) {
+	return fuelcell->mode;
+}
 
 /* -----------------------------
  * STATE_INIT
@@ -44,20 +60,45 @@ static void on_enter_init(void) {
 
 	timeout_flag = 0;
 	fc_state_flag = 0;
-	fuelcell.enable_command = 0;
+//	fuelcell.enable_command = 0;
+//	fc_set_enable_command(&fuelcell, 0);
+
+#ifdef DUMMY
+	fc_set_enable_command(&fuelcell_dummy, 0);
+#else
+    fc_set_enable_command(&fuelcell, 0);
+#endif
 }
 
 static void on_update_init(void) {
 	/* Check system status, wait for start command */
 	DEBUG_PRINT("FSM", "RUN INIT");
-	fc_state_flag = fuelcell.enable_command ^ display_start;
 
+#ifdef DUMMY
+//	fc_state_flag = fuelcell.enable_command;
+	fc_state_flag = fc_get_enable_command(&fuelcell_dummy);
 	// this function return 0 and 1 integer format, always return 0 on independent mode
-	if (fuelcell.mode == INTEGRATED) {
+//	if (fuelcell.mode == INTEGRATED) {
+//		if (fc_can_check_timeout())
+//			timeout_flag = 1;
+//	}
+	if (fc_check_mode(&fuelcell_dummy) == INTEGRATED) {
 		if (fc_can_check_timeout())
 			timeout_flag = 1;
 	}
-
+#else
+	//	fc_state_flag = fuelcell.enable_command;
+		fc_state_flag = fc_get_enable_command(&fuelcell);
+		// this function return 0 and 1 integer format, always return 0 on independent mode
+	//	if (fuelcell.mode == INTEGRATED) {
+	//		if (fc_can_check_timeout())
+	//			timeout_flag = 1;
+	//	}
+		if (fc_check_mode(&fuelcell) == INTEGRATED) {
+			if (fc_can_check_timeout())
+				timeout_flag = 1;
+		}
+#endif
 }
 
 static void on_exit_init(void) {
@@ -82,7 +123,11 @@ static void on_enter_prestarting(void) {
 	fc_io_system(OFF);
 	fc_io_can_filter(ON);
 
+#ifdef DUMMY
+	prestart_flag = fc_sensor_precheck(&fuelcell_dummy);
+#else
 	prestart_flag = fc_sensor_precheck(&fuelcell);
+#endif
 }
 
 static void on_update_prestarting(void) {
@@ -148,13 +193,34 @@ static void on_enter_active(void) {
 static void on_update_active(void) {
 	/* Perform active tasks */
 	DEBUG_PRINT("FSM", "RUN ACTIVE");
-	fc_state_flag = fuelcell.enable_command ^ display_start;
 
+#ifdef DUMMY
+//	fc_state_flag = fuelcell.enable_command;
+	fc_state_flag = fc_get_enable_command(&fuelcell_dummy);
 	// this function return 0 and 1 integer format, always return 0 on independent mode
-	if (fuelcell.mode == INTEGRATED) {
+//	if (fuelcell.mode == INTEGRATED) {
+//		if (fc_can_check_timeout())
+//			timeout_flag = 1;
+//	}
+	if (fc_check_mode(&fuelcell_dummy) == INTEGRATED) {
 		if (fc_can_check_timeout())
 			timeout_flag = 1;
 	}
+#else
+	//	fc_state_flag = fuelcell.enable_command;
+		fc_state_flag = fc_get_enable_command(&fuelcell);
+		// this function return 0 and 1 integer format, always return 0 on independent mode
+	//	if (fuelcell.mode == INTEGRATED) {
+	//		if (fc_can_check_timeout())
+	//			timeout_flag = 1;
+	//	}
+		if (fc_check_mode(&fuelcell) == INTEGRATED) {
+			if (fc_can_check_timeout())
+				timeout_flag = 1;
+		}
+#endif
+
+
 
 }
 
@@ -214,7 +280,13 @@ static void on_update_timeout(void) {
 	/* Monitor for reset or recovery */
 	DEBUG_PRINT("FSM", "RUN TIMEOUT");
 	HAL_GPIO_TogglePin(EX_0_GPIO_Port, EX_0_Pin);
-	timeout_flag = fuelcell.enable_command;
+	//timeout_flag = fuelcell.enable_command;
+#ifdef DUMMY
+	timeout_flag = fc_get_enable_command(&fuelcell_dummy);
+#else
+	timeout_flag = fc_get_enable_command(&fuelcell);
+#endif
+
 }
 
 static void on_exit_timeout(void) {
@@ -223,7 +295,12 @@ static void on_exit_timeout(void) {
 
 	timeout_flag = 0;
 	fc_state_flag = 0;
-	fuelcell.enable_command = 0;
+	//	fuelcell.enable_command = 0;
+#ifdef DUMMY
+	fc_set_enable_command(&fuelcell_dummy, 0);
+#else
+    fc_set_enable_command(&fuelcell, 0);
+#endif
 
 	HAL_GPIO_WritePin(EX_0_GPIO_Port, EX_0_Pin, GPIO_PIN_SET);
 
@@ -262,7 +339,13 @@ static void on_exit_stop(void) {
 
 	timeout_flag = 0;
 	fc_state_flag = 0;
-	fuelcell.enable_command = 0;
+	//	fuelcell.enable_command = 0;
+#ifdef DUMMY
+	fc_set_enable_command(&fuelcell_dummy, 0);
+#else
+    fc_set_enable_command(&fuelcell, 0);
+#endif
+
 
 }
 
@@ -325,5 +408,11 @@ void fc_fsm_init(void) {
 
 inline void fc_fsm_update(void) {
 	fsm_run(&fsm);
-	fuelcell.state = fsm.current_state;
+//	fuelcell.state = fsm.current_state;
+#ifdef DUMMY
+    fc_set_state(&fuelcell_dummy, &fsm);
+#else
+	fc_set_state(&fuelcell, &fsm);
+#endif
+
 }

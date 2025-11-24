@@ -11,9 +11,7 @@ extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
 extern FullCell_t fuelcell;
-
-
-FullCell_t fuelcell_dummy;
+extern FullCell_t fuelcell_dummy;
 
 /* prototype function
  */
@@ -153,7 +151,11 @@ void fc_can_gcan_transmit() {
 	TxHeader_Status.RTR = CAN_RTR_DATA;
 	TxHeader_Status.DLC = 8;
 
+#ifdef DUMMY
+	fc_can_pack_status(&fuelcell_dummy, TxData_Status);
+#else
 	fc_can_pack_status(&fuelcell, TxData_Status);
+#endif
 //	fc_can_pack_status(&fuelcell_dummy, TxData_Status);
 
 
@@ -162,7 +164,11 @@ void fc_can_gcan_transmit() {
 	TxHeader_Data.RTR = CAN_RTR_DATA;
 	TxHeader_Data.DLC = 8;
 
+#ifdef DUMMY
+	fc_can_pack_measurements(&fuelcell_dummy, TxData_Data);
+#else
 	fc_can_pack_measurements(&fuelcell, TxData_Data);
+#endif
 //	fc_can_pack_measurements(&fuelcell_dummy, TxData_Data);
 
 
@@ -195,9 +201,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 		Error_Handler();
 	}
 	if ((global_RxHeader.ExtId == 0x0CF11200)) {
-		fc_can_parse_command(&fuelcell, global_RxData);
-//		fc_can_parse_command(&fuelcell_dummy, global_RxData);
 
+#ifdef DUMMY
+		fc_can_parse_command(&fuelcell_dummy, global_RxData);
+#else
+		fc_can_parse_command(&fuelcell, global_RxData);
+#endif
 		g_last_can_rx_time = HAL_GetTick();
 	}
 }
